@@ -1,153 +1,138 @@
-document.addEventListener('DOMContentLoaded',()=>{
-
-    const moviePlaceHolder = ()=>{
-        fetch(url)
-        .then(res =>res.json())
-        .then(content =>{
-            const firstMovie = content.films[0]
-
-            const filmImg = document.getElementById("poster")
-            const movieTitle = document.getElementById("filmTitle")
-            const movieDescr = document.getElementById("movieDescription")
-            const runningTime = document.getElementById("runtime")
-            const showingTime = document.getElementById("showtime")
-            const availTicket =document.getElementById("ticketsAvailable")
-            filmImg.src = firstMovie.poster
-            movieTitle.innerText = firstMovie.title
-            movieDescr.innerText = firstMovie.description
-            runningTime.innerText =`Runtime: ${firstMovie.runtime} minutes`
-            showingTime.innerText =`Showtime: ${firstMovie.showtime}`
-            availTicket.innerText =`Tickets Available: (${firstMovie.capacity - firstMovie.tickets_sold})`
+// first movie fetch url
+//const url1 = 'http://localhost:3000/films/1' 
+// all movies fetch url
+let url = 'https://flatdango-sage.vercel.app/db.json'
 
 
-            const ticketBuy = document.getElementById("buyTicket")
-            let tickets = Number(firstMovie.capacity - firstMovie.tickets_sold)
+document.addEventListener('DOMContentLoaded', ()=>{
 
-            ticketBuy.addEventListener('click',()=>{
+document.getElementsByClassName('nav-item')[0].remove()
 
-                tickets--
+    // get first movie details
+    const fetchData1 = () => {
+    fetch(url).then(res => res.json())
+    .then(firstMovie => {
+        console.log(firstMovie.films)
+        const movie1 =  document.getElementById('poster')
+        console.log(movie1)
+        movie1.src = firstMovie.films[0].poster
+        const movie1Title = document.querySelector('#title');
+        movie1Title.textContent = firstMovie.films[0].title;
+        const movie1Time = document.querySelector('#runtime');
+        movie1Time.textContent = `${firstMovie.films[0].runtime} minutes`;
+        const movie1Description = document.querySelector('#description');
+        movie1Description.textContent = firstMovie.films[0].description;
+        const showTime = document.querySelector('#showtime')
+        showTime.textContent = firstMovie.films[0].showtime;
+        const tickets  = document.querySelector('#available-ticket')
+        tickets.textContent = firstMovie.films[0].capacity - firstMovie.films[0].tickets_sold;
+        const btn = document.getElementById('buy-ticket')
+        btn.textContent = 'buy movie'
 
-                // const ticketRemaining = tickets-1
-
-                if(tickets <= 0){
-                    const frstMovie = document.getElementById("1")
-                    frstMovie.innerHTML=`${firstMovie.title}  <span class="badge bg-danger me-1">SOLD OUT</span>`
-
-                    availTicket.innerHTML = `Ticketd available:  <span class="badge bg-danger">SOLD OUT</span>`
-                }else{
-                    availTicket.innerText = `Tickets available: (${tickets})`
-                }
-            })
-
-        })
-
-
-
-
+    })
     }
 
+    const navBar = document.getElementById('movies-list')
 
+    //Create fetch function
+    const fetchAllMovies = url => {
+        fetch(url).then(res => res.json())
+        .then(movies => {
+            movies.films.forEach(movie => {
+                displayAllMovies(movie)
+            });
+        })
+    }
 
-    const movieDetails = ()=>{
-        fetch(url)
-        .then(response=>response.json())
-        .then(data=>{
-            const filmData = data.films
-            console.log(filmData)
-            for(let i = 0; i < filmData.length; i++){
-                let item = filmData[i]
-                console.log(item)
-                const movieList = document.createElement("li")
-                const list = document.getElementById("showingMovie")
+    // display movies lists in the menu 
+    const displayAllMovies = movie => {
+    
+        const li = document.createElement('li')
+        li.style.cursor ="pointer"
+        li.textContent = (movie.title).toUpperCase()
+        navBar.appendChild(li)
+        displayMovieDetails()
+    }
 
-                movieList.classList.add("list-group-item", "border", "border-info", "sinema")
+    // click to dsplay movie details
+    ///const displayMovieDetails = () =>{
+       // let children = navBar.children
+        // console.log(children)
 
-                movieList.setAttribute('id',`${item.id}`)
-                // movieList.className = "sinema"
-                movieList.innerText = item.title
-                console.log(item.title)
+        //for(let i=0; i<children.length; i++){
+          //  let child = children[i]
+            // console.log(child)
 
+          //  child.addEventListener('click',() => {
+              //  fetch(`${url}/${i+1}`)
 
-                list.appendChild(movieList)
+              //  .then(res => res.json())
+               // .then(movie => {
+                 //   document.getElementById('buy-ticket').textContent = 'Buy Ticket'
+                 //   setUpMovieDetails(movie)
+              //  })
 
-                movieList.addEventListener('click',()=>{
-                    const filmImage = document.getElementById("poster")
-                    const filmTitle = document.getElementById("filmTitle")
-                    const filmDescr = document.getElementById("movieDescription")
-                    const runTime = document.getElementById("runtime")
-                    const showTime = document.getElementById("showtime")
-                    const availTickets =document.getElementById("ticketsAvailable")
+           // })
+        //}
+  //  }
+  const displayMovieDetails = () =>{
+    
+            
+            // let children = navBar.children
+            // // console.log(children)
+    
+            // for(let i=0; i<children.length; i++){
+            //     let child = children[i]
+                // console.log(child)
+    
+                navBar.addEventListener('click',(e) => {
+                    fetch(url)
+    
+                    .then(res => res.json())
+                    .then(movies => {
+                        movies.films.map(movie=>{if(e.target.textContent === movie.title.toUpperCase()){
+                            document.getElementById('buy-ticket').textContent = 'Buy Ticket'
+                            setUpMovieDetails(movie)
+                            }
 
-
-                    filmImage.src = item.poster
-                    filmTitle.innerText = item.title
-                    filmDescr.innerText = item.description
-                    runTime.innerHTML =`Runtime:<span>${item.runtime}</span>`
-                    showTime.innerText =`Showtime: ${item.showtime}`
-                    availTickets.innerText =`Tickets available: (${item.capacity - item.tickets_sold})`
-
-                    const ticketsBuy = document.getElementById("buyTicket")
-                    let ticket = Number(item.capacity - item.tickets_sold)
-
-                    ticketsBuy.addEventListener('click',()=>{
-
-                        // const ticketRemain = ticket-1
-                        ticket --
-                        if(ticket <= 0){
-                            movieList.innerHTML =`${item.title} <span class="badge bg-danger">SOLD OUT</span>`
-
-                            availTickets.innerHTML = `Tickets available: <span class="badge bg-danger">SOLD OUT</span>`
-
-                        }else{
-
-                            availTickets.innerText = `Tickets available: (${ticket})`
-                        }
-                        // availTickets.innerText = `Tickets available: ${ticket}`
-                        // while(ticket> -1){
-                        //     availTickets.innerText = `Tickets available: ${ticket}`
-                        //     if(ticket === 0){
-                        //         return availTickets.innerText = "SOLD OUT"
-                        //     }
-
-                        // }
-
-
-
-
-                        // if(ticket === 0){
-                        //     return availTickets.innerText = "SOLD OUT"
-                        // }
-
-                        // for(let i = ticket; i > -1 ; i-=1 ){
-
-                        //     const ticketRemain = i
-                        //     availTickets.innerText = `Tickets available: ${ticketRemain}`
-                        //     if(ticketRemain === 0){
-                        //         availTickets.innerText = "SOLD OUT"
-                        //     }
-
-
-                        // }
-
-
+                        })
+                       
                     })
-
-
-
+    
                 })
-
-
             }
+    // create movie details card
+    function setUpMovieDetails(childMovie){
+        const preview = document.getElementById('poster')
+        preview.src = childMovie.poster;
 
+        const movieTitle = document.querySelector('#title');
+        movieTitle.textContent = childMovie.title;
+        const movieTime = document.querySelector('#runtime');
+        movieTime.textContent = `${childMovie.runtime} minutes`;
+        const movieDescription = document.querySelector('#description');
+        movieDescription.textContent = childMovie.description;
+        const showTime = document.querySelector('#showtime')
+        showTime.textContent = childMovie.showtime;
+        const tickets  = document.querySelector('#available-ticket')
+        tickets.textContent = childMovie.capacity - childMovie.tickets_sold;
+    }
+    const btn = document.getElementById('buy-ticket')
 
-
-
+            btn.addEventListener('click', function(e){
+                let availableTicket = document.querySelector('#available-ticket').textContent
+                e.preventDefault()
+                if(availableTicket > 0){
+                    document.querySelector('#available-ticket').textContent  = availableTicket-1
+                    
+                }
+                else if(parseInt(availableTicket, 10)===0){
+                    btn.textContent = 'Sold Out'
+                    btn.classList.add('')
+                }
         })
 
-    }
-
-
-    movieDetails()
-    moviePlaceHolder()
+        fetchAllMovies(url)
+        fetchData1()
 
 })
